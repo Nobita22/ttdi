@@ -226,7 +226,7 @@
 
   <div class="landing-container" tabindex="0" aria-label="Welcome landing page">
     <h1>Welcome to Your Pi</h1>
-  <p class="lead"></p>
+    <p class="lead">Full Access.</p>
 
     <div class="btn-group" role="group" aria-label="Primary actions">
       <button class="btn btn-shutdown" data-url="http://sameer-desktop.local/shutdown.php">Shutdown Pi</button>
@@ -258,6 +258,11 @@
           window.location.href = url;
         }, 50);
       });
+    });
+
+    // Ensure loading overlay is hidden when navigating back to this page
+    window.addEventListener('pageshow', () => {
+      loadingOverlay.classList.remove('visible');
     });
 
     if ('serviceWorker' in navigator) {
