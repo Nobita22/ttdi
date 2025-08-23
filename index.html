@@ -66,6 +66,7 @@
       display: flex;
       gap: 30px;
       justify-content: center;
+      flex-wrap: wrap;
     }
     button {
       cursor: pointer;
@@ -81,6 +82,7 @@
       user-select: none;
       position: relative;
       overflow: hidden;
+      white-space: nowrap;
     }
     button:focus {
       outline: none;
@@ -109,6 +111,18 @@
       background: #3b3b70;
       color: #dddeff;
       box-shadow: 0 16px 30px #6f6fffcc;
+      transform: translateY(-5px);
+    }
+    .btn-terminal {
+      background: linear-gradient(45deg, #00c6ff, #0072ff);
+      color: white;
+      box-shadow:
+        0 16px 32px #0093e9ab,
+        inset 0 -3px 10px #48a8ff57;
+    }
+    .btn-terminal:hover {
+      background: linear-gradient(45deg, #008cff, #005ecb);
+      box-shadow: 0 20px 45px #006ee8cc;
       transform: translateY(-5px);
     }
 
@@ -170,6 +184,7 @@
     <div class="btn-group" role="group" aria-label="Primary actions">
       <button class="btn btn-shutdown" onclick="confirmShutdown()">Shutdown Pi</button>
       <button class="btn btn-open" onclick="openPi()">Open Pi</button>
+      <button class="btn btn-terminal" onclick="openTerminal()">CP-Terminal</button>
     </div>
   </div>
 
@@ -178,25 +193,29 @@
 <script>
   function confirmShutdown() {
     if(confirm("Are you absolutely sure you want to shutdown your Raspberry Pi?")) {
-      window.location.href = "http:samer-desktop.local/shutdown.php";
+      window.location.href = "http://sameer-desktop.local/shutdown.php";
     }
   }
   function openPi() {
-    window.location.href = "http:samer-desktop.local/index.php";
+    window.location.href = "http://sameer-desktop.local/index.php";
   }
+  function openTerminal() {
+    window.location.href = "http://sameer-desktop.local:9090";
+  }
+
   if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js').then(registration => {
-    registration.onupdatefound = () => {
-      const newWorker = registration.installing;
-      newWorker.onstatechange = () => {
-        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-          // New content is available; reload page to reflect changes
-          window.location.reload();
-        }
+    navigator.serviceWorker.register('sw.js').then(registration => {
+      registration.onupdatefound = () => {
+        const newWorker = registration.installing;
+        newWorker.onstatechange = () => {
+          if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+            // New content is available; reload page to reflect changes
+            window.location.reload();
+          }
+        };
       };
-    };
-  }).catch(console.error);
-}
+    }).catch(console.error);
+  }
 </script>
 
 </body>
