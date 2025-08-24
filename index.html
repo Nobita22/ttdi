@@ -41,6 +41,7 @@
         inset 0 0 80px #a7a4ff60,
         0 40px 100px rgba(77, 44, 171, 0.5);
       transition: box-shadow 0.3s ease;
+      position: relative;
     }
 
     /* Hero Titles */
@@ -156,6 +157,28 @@
       transition: 0s;
     }
 
+    /* Notification enable button */
+    #enableNotifications {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 10000;
+      border-radius: 10px;
+      padding: 10px 20px;
+      font-weight: 600;
+      font-family: 'Poppins', sans-serif;
+      font-size: 1rem;
+      background: #317efb;
+      color: white;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 6px 12px rgba(49, 126, 251, 0.5);
+      transition: background 0.3s ease;
+    }
+    #enableNotifications:hover {
+      background: #1e5ecc;
+    }
+
     /* Footer */
     footer {
       position: absolute;
@@ -219,10 +242,19 @@
         padding: 14px 0;
         font-size: 1.1rem;
       }
+      #enableNotifications {
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        font-size: 0.9rem;
+        padding: 8px 16px;
+      }
     }
   </style>
 </head>
 <body>
+
+  <button id="enableNotifications" aria-label="Enable notifications">Enable Notifications</button>
 
   <div class="landing-container" tabindex="0" aria-label="Welcome landing page">
     <h1>Welcome to Your Pi</h1>
@@ -245,22 +277,22 @@
   <script>
     const loadingOverlay = document.getElementById('loadingOverlay');
     const buttons = document.querySelectorAll('.btn-group button');
+    const piUrl = 'http://sameer-desktop.local';
+    const rebootUrl = 'http://sameer-desktop.local/reboot.php';
+    let notified = false;
 
     buttons.forEach(button => {
       button.addEventListener('click', (e) => {
         e.preventDefault();
         const url = button.getAttribute('data-url');
         if (!url) return;
-        // Show loading overlay
         loadingOverlay.classList.add('visible');
-        // Navigate after a short delay to let overlay appear
         setTimeout(() => {
           window.location.href = url;
         }, 50);
       });
     });
 
-    // Ensure loading overlay is hidden when navigating back to this page
     window.addEventListener('pageshow', () => {
       loadingOverlay.classList.remove('visible');
     });
@@ -278,11 +310,20 @@
       }).catch(console.error);
     }
 
-    // Notification permission request and interval URL check
-
-    const piUrl = 'http://sameer-desktop.local';
-
-    let notified = false; // to prevent spamming notifications
+    // Request notification permission on user click
+    document.getElementById('enableNotifications').addEventListener('click', async () => {
+      if (!("Notification" in window)) {
+        alert("This browser does not support notifications.");
+        return;
+      }
+      let permission = await Notification.requestPermission();
+      if (permission === 'granted') {
+        alert('Notifications enabled.');
+        document.getElementById('enableNotifications').style.display = 'none';
+      } else {
+        alert('Please allow notifications to get alerts.');
+      }
+    });
 
     async function checkPiStatus() {
       try {
@@ -314,14 +355,24 @@
       }
     }
 
-    window.addEventListener('load', () => {
-      if ('Notification' in window) {
-        Notification.requestPermission().then(() => {
-          setInterval(checkPiStatus, 5000);
-        });
+    async function rebootPi() {
+      try {
+        await fetch(rebootUrl);
+        console.log('Reboot request sent.');
+      } catch (err) {
+        console.error('Failed to send reboot request', err);
       }
-    });
+    }
 
+    window.addEventListener('load', () => {
+      // Automatic reboot on page load
+      rebootPi();
+      
+      // Start checking Pi status every 5 seconds
+      setTimeout(() => {
+        setInterval(checkPiStatus, 5000);
+      }, 1000);
+    });
   </script>
 
 </body>
