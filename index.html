@@ -24,10 +24,13 @@
       overflow: hidden;
       animation: fadeInScale 1s ease forwards;
     }
+    
     @keyframes fadeInScale {
       0% {opacity: 0; transform: scale(0.95);}
       100% {opacity: 1; transform: scale(1);}
     }
+
+    /* Container without tilt */
     .landing-container {
       background: rgba(255,255,255,0.07);
       border-radius: 30px;
@@ -38,8 +41,9 @@
         inset 0 0 80px #a7a4ff60,
         0 40px 100px rgba(77, 44, 171, 0.5);
       transition: box-shadow 0.3s ease;
-      position: relative;
     }
+
+    /* Hero Titles */
     h1 {
       font-family: 'Poppins', sans-serif;
       font-weight: 600;
@@ -56,6 +60,8 @@
       color: #cccce7dd;
       user-select: none;
     }
+
+    /* Buttons */
     .btn-group {
       display: flex;
       gap: 30px;
@@ -81,6 +87,7 @@
     button:focus {
       outline: none;
     }
+
     .btn-shutdown {
       background: linear-gradient(45deg, #ff416c, #ff4b2b);
       color: white;
@@ -130,6 +137,8 @@
       box-shadow: 0 20px 45px #006ee8cc;
       transform: translateY(-5px);
     }
+
+    /* Ripple effect on buttons */
     button:after {
       content: "";
       position: absolute;
@@ -146,26 +155,8 @@
       height: 350%;
       transition: 0s;
     }
-    #enableNotifications {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      z-index: 10000;
-      border-radius: 10px;
-      padding: 10px 20px;
-      font-weight: 600;
-      font-family: 'Poppins', sans-serif;
-      font-size: 1rem;
-      background: #317efb;
-      color: white;
-      border: none;
-      cursor: pointer;
-      box-shadow: 0 6px 12px rgba(49, 126, 251, 0.5);
-      transition: background 0.3s ease;
-    }
-    #enableNotifications:hover {
-      background: #1e5ecc;
-    }
+
+    /* Footer */
     footer {
       position: absolute;
       bottom: 25px;
@@ -175,6 +166,8 @@
       color: #aa99ffbb;
       user-select: none;
     }
+
+    /* Loading overlay */
     #loadingOverlay {
       position: fixed;
       top: 0; left: 0;
@@ -194,9 +187,11 @@
       opacity: 1;
       transition-delay: 0s;
     }
+
+    /* Spinner styles */
     .spinner {
-      border: 6px solid #f3f3f3;
-      border-top: 6px solid #317efb;
+      border: 6px solid #f3f3f3; /* Light grey */
+      border-top: 6px solid #317efb; /* Blue */
       border-radius: 50%;
       width: 60px;
       height: 60px;
@@ -206,151 +201,83 @@
       0% { transform: rotate(0deg);}
       100% { transform: rotate(360deg);}
     }
+
     @media (max-width: 480px) {
-      h1 { font-size: 2.7rem; }
-      p.lead { font-size: 1rem; margin-bottom: 30px; }
-      .btn-group { flex-direction: column; gap: 18px; }
-      button { width: 100%; padding: 14px 0; font-size: 1.1rem; }
-      #enableNotifications {
-        top: 10px; right: 10px; font-size: 0.9rem; padding: 8px 16px;
+      h1 {
+        font-size: 2.7rem;
+      }
+      p.lead {
+        font-size: 1rem;
+        margin-bottom: 30px;
+      }
+      .btn-group {
+        flex-direction: column;
+        gap: 18px;
+      }
+      button {
+        width: 100%;
+        padding: 14px 0;
+        font-size: 1.1rem;
       }
     }
   </style>
 </head>
 <body>
 
-<button id="enableNotifications" aria-label="Enable notifications">Enable Notifications</button>
+  <div class="landing-container" tabindex="0" aria-label="Welcome landing page">
+    <h1>Welcome to Your Pi</h1>
+    <p class="lead"></p>
 
-<div class="landing-container" tabindex="0" aria-label="Welcome landing page">
-  <h1>Welcome to Your Pi</h1>
-  <p class="lead"></p>
-
-  <div class="btn-group" role="group" aria-label="Primary actions">
-    <button class="btn btn-shutdown" data-url="http://sameer-desktop.local/shutdown.php">Shutdown Pi</button>
-    <button class="btn btn-reboot" data-url="http://sameer-desktop.local/reboot.php">Reboot Pi</button>
-    <button class="btn btn-open" data-url="http://sameer-desktop.local">Open Pi</button>
-    <button class="btn btn-terminal" data-url="http://sameer-desktop.local:9090">CP-Terminal</button>
+    <div class="btn-group" role="group" aria-label="Primary actions">
+      <button class="btn btn-shutdown" data-url="http://sameer-desktop.local/shutdown.php">Shutdown Pi</button>
+      <button class="btn btn-reboot" data-url="http://sameer-desktop.local/reboot.php">Reboot Pi</button>
+      <button class="btn btn-open" data-url="http://sameer-desktop.local">Open Pi</button>
+      <button class="btn btn-terminal" data-url="http://sameer-desktop.local:9090">CP-Terminal</button>
+    </div>
   </div>
-</div>
 
-<div id="loadingOverlay" aria-live="assertive" aria-label="Loading page">
-  <div class="spinner" role="img" aria-hidden="true"></div>
-</div>
+  <div id="loadingOverlay" aria-live="assertive" aria-label="Loading page">
+    <div class="spinner" role="img" aria-hidden="true"></div>
+  </div>
 
-<footer></footer>
+  <footer></footer>
 
-<script>
-  const loadingOverlay = document.getElementById('loadingOverlay');
-  const buttons = document.querySelectorAll('.btn-group button');
-  const piUrl = 'http://sameer-desktop.local';
-  const rebootUrl = 'http://sameer-desktop.local/reboot.php';
-  let notified = false;
+  <script>
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const buttons = document.querySelectorAll('.btn-group button');
 
-  buttons.forEach(button => {
-    button.addEventListener('click', (e) => {
-      e.preventDefault();
-      const url = button.getAttribute('data-url');
-      if (!url) return;
-      loadingOverlay.classList.add('visible');
-      setTimeout(() => {
-        window.location.href = url;
-      }, 50);
-    });
-  });
-
-  window.addEventListener('pageshow', () => {
-    loadingOverlay.classList.remove('visible');
-  });
-
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js').then(registration => {
-      registration.onupdatefound = () => {
-        const newWorker = registration.installing;
-        newWorker.onstatechange = () => {
-          if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-            window.location.reload();
-          }
-        };
-      };
-    }).catch(console.error);
-  }
-
-  async function requestNotificationPermission() {
-    if (!("Notification" in window)) {
-      alert("This browser does not support notifications.");
-      return false;
-    }
-    if (Notification.permission === "denied") {
-      alert("Notification permission is denied! Please enable it in your browser settings.");
-      return false;
-    }
-    if (Notification.permission === "granted") {
-      return true;
-    }
-
-    const permission = await Notification.requestPermission();
-    if (permission === "granted") {
-      alert("Notification permission granted.");
-      return true;
-    } else {
-      alert("Notification permission not granted.");
-      return false;
-    }
-  }
-
-  document.getElementById('enableNotifications').addEventListener('click', async () => {
-    const granted = await requestNotificationPermission();
-    if (granted) {
-      document.getElementById('enableNotifications').style.display = 'none';
-    }
-  });
-
-  async function checkPiStatus() {
-    try {
-      const response = await fetch(piUrl, { method: 'GET', cache: 'no-store' });
-      if (response.ok) {
-        if (!notified) {
-          showNotification();
-          notified = true;
-        }
-      } else {
-        notified = false;
-      }
-    } catch (error) {
-      notified = false;
-    }
-  }
-
-  function showNotification() {
-    if (Notification.permission === 'granted') {
-      const notification = new Notification('Pi Network Connected', {
-        body: 'Your Pi is online. Click to open the Pi page.',
-        icon: '/pi/icon2.png',
-        tag: 'pi-notification'
+    buttons.forEach(button => {
+      button.addEventListener('click', (e) => {
+        e.preventDefault();
+        const url = button.getAttribute('data-url');
+        if (!url) return;
+        // Show loading overlay
+        loadingOverlay.classList.add('visible');
+        // Navigate after a short delay to let overlay appear
+        setTimeout(() => {
+          window.location.href = url;
+        }, 50);
       });
-      notification.onclick = () => {
-        window.open(piUrl, '_blank');
-        notification.close();
-      };
-    }
-  }
+    });
 
-  async function rebootPi() {
-    try {
-      await fetch(rebootUrl);
-      console.log('Reboot request sent.');
-    } catch (err) {
-      console.error('Failed to send reboot request', err);
-    }
-  }
+    // Ensure loading overlay is hidden when navigating back to this page
+    window.addEventListener('pageshow', () => {
+      loadingOverlay.classList.remove('visible');
+    });
 
-  window.addEventListener('load', () => {
-    rebootPi();
-    setTimeout(() => {
-      setInterval(checkPiStatus, 5000);
-    }, 1000);
-  });
-</script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js').then(registration => {
+        registration.onupdatefound = () => {
+          const newWorker = registration.installing;
+          newWorker.onstatechange = () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              window.location.reload();
+            }
+          };
+        };
+      }).catch(console.error);
+    }
+  </script>
 
 </body>
 </html>
