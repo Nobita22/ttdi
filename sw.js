@@ -75,36 +75,3 @@ self.addEventListener('activate', event => {
     )
   );
 });
-// Request notification permission when the page loads
-document.addEventListener('DOMContentLoaded', () => {
-  if ('Notification' in window) {
-    Notification.requestPermission().then(permission => {
-      if (permission === 'granted') {
-        checkAndNotify();
-      }
-    });
-  }
-});
-
-function checkAndNotify() {
-  // Notify if online when the script runs
-  if (navigator.onLine) {
-    showPiNotification();
-  }
-
-  // Listen for online event
-  window.addEventListener('online', () => {
-    showPiNotification();
-  });
-}
-
-function showPiNotification() {
-  const piUrl = 'http://sameer-desktop.local';
-  new Notification('Pi Network Connected', {
-    body: 'You are connected to the local network. Click here to open your Pi page.',
-    icon: '/pi/icon2.png'
-  }).onclick = () => {
-    window.open(piUrl, '_blank');
-  };
-}
-
