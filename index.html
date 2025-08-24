@@ -282,14 +282,21 @@
 
     const piUrl = 'http://sameer-desktop.local';
 
+    let notified = false; // to prevent spamming notifications
+
     async function checkPiStatus() {
       try {
-        const response = await fetch(piUrl, { method: 'HEAD', cache: 'no-store' });
+        const response = await fetch(piUrl, { method: 'GET', cache: 'no-store' });
         if (response.ok) {
-          showNotification();
+          if (!notified) {
+            showNotification();
+            notified = true;
+          }
+        } else {
+          notified = false;
         }
       } catch (error) {
-        // Not reachable - do nothing
+        notified = false;
       }
     }
 
@@ -309,9 +316,10 @@
 
     window.addEventListener('load', () => {
       if ('Notification' in window) {
-        Notification.requestPermission();
+        Notification.requestPermission().then(() => {
+          setInterval(checkPiStatus, 5000);
+        });
       }
-      setInterval(checkPiStatus, 5000);
     });
 
   </script>
