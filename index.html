@@ -7,7 +7,6 @@
   <title>My PI</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600&family=Roboto&display=swap');
-
     /* Reset & base */
     * {
       box-sizing: border-box;
@@ -16,8 +15,8 @@
     body, html {
       height: 100%;
       font-family: 'Roboto', sans-serif;
-      background: linear-gradient(135deg, #5a11d2, #927eff);
-      color: #fff;
+      background: linear-gradient(135deg, var(--bg-gradient-start, #5a11d2), var(--bg-gradient-end, #927eff));
+      color: var(--text-color, #fff);
       display: flex;
       justify-content: center;
       align-items: center;
@@ -28,6 +27,18 @@
     @keyframes fadeInScale {
       0% {opacity: 0; transform: scale(0.95);}
       100% {opacity: 1; transform: scale(1);}
+    }
+
+    /* Pulsing animation for connection dot */
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 8px #4ade80cc;
+      }
+      50% {
+        transform: scale(1.15);
+        box-shadow: 0 0 14px #4ade80cc;
+      }
     }
 
     /* Container without tilt */
@@ -41,6 +52,9 @@
         inset 0 0 80px #a7a4ff60,
         0 40px 100px rgba(77, 44, 171, 0.5);
       transition: box-shadow 0.3s ease;
+      text-align: center;
+      position: relative;
+      animation: fadeInScale 1s ease forwards;
     }
 
     /* Hero Titles */
@@ -50,8 +64,63 @@
       font-size: 3.8rem;
       letter-spacing: -0.04em;
       text-shadow: 0 0 15px #a693f8cc;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
       user-select: none;
+    }
+    /* Status text with refresh */
+    #connectionStatus {
+      font-weight: 600;
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.1rem;
+      margin-bottom: 30px;
+      user-select: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    #connectionStatus .dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      display: inline-block;
+      background-color: #ff4b4b; /* default red */
+      box-shadow: 0 0 6px #ff4b4baa;
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+      flex-shrink: 0;
+    }
+    #connectionStatus.connected .dot {
+      background-color: #4ade80; /* green */
+      animation: pulse 2.5s infinite;
+    }
+    /* Minimal Refresh button */
+    #refreshBtn {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      margin: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-color, #fff);
+      transition: color 0.3s ease;
+      user-select: none;
+      flex-shrink: 0;
+      width: 20px;
+      height: 20px;
+      line-height: 1;
+    }
+    #refreshBtn:hover,
+    #refreshBtn:focus {
+      color: #b5b5ff;
+      outline: none;
+    }
+    #refreshBtn svg {
+      width: 100%;
+      height: 100%;
+      fill: currentColor;
+      vertical-align: middle;
+      display: block;
     }
     p.lead {
       font-size: 1.25rem;
@@ -59,6 +128,38 @@
       margin-bottom: 40px;
       color: #cccce7dd;
       user-select: none;
+    }
+    /* Theme toggle */
+    #themeToggle {
+      position: absolute;
+      top: 15px;
+      right: 25px;
+      background-color: transparent;
+      border: 1px solid var(--text-color, #fff);
+      color: var(--text-color, #fff);
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s ease;
+      user-select: none;
+      font-size: 1.25rem;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #themeToggle:hover,
+    #themeToggle:focus {
+      background-color: var(--text-color, #fff);
+      color: var(--bg-gradient-start, #5a11d2);
+      outline: none;
+    }
+
+    /* Animate theme toggle icon rotation */
+    #themeToggle.rotating {
+      transform: rotate(360deg);
     }
 
     /* Buttons */
@@ -68,7 +169,7 @@
       justify-content: center;
       flex-wrap: wrap;
     }
-    button {
+    button.btn-group-btn {
       cursor: pointer;
       border: none;
       border-radius: 9999px;
@@ -84,10 +185,24 @@
       overflow: hidden;
       white-space: nowrap;
     }
-    button:focus {
-      outline: none;
+
+    /* Button hover scale & shadow effect */
+    button.btn-group-btn:hover:not(:disabled) {
+      transform: scale(1.05);
+      box-shadow: 0 20px 30px rgba(0, 0, 70, 0.8);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
 
+    button.btn-group-btn:focus {
+      outline: none;
+    }
+    button.btn-group-btn:disabled {
+      cursor: default;
+      opacity: 0.5;
+      box-shadow: none !important;
+      transform: none !important;
+      pointer-events: none;
+    }
     .btn-shutdown {
       background: linear-gradient(45deg, #ff416c, #ff4b2b);
       color: white;
@@ -95,7 +210,7 @@
         0 16px 32px #ff4e3dab,
         inset 0 -3px 10px #ff725357;
     }
-    .btn-shutdown:hover {
+    .btn-shutdown:hover:not(:disabled) {
       background: linear-gradient(45deg, #ff5e81, #ff663f);
       box-shadow: 0 20px 45px #ff4e3dcc;
       transform: translateY(-5px);
@@ -107,7 +222,7 @@
         0 16px 32px #d57e00ab,
         inset 0 -3px 10px #f2d85457;
     }
-    .btn-reboot:hover {
+    .btn-reboot:hover:not(:disabled) {
       background: linear-gradient(45deg, #e28500, #d4b800);
       box-shadow: 0 20px 45px #c8a800cc;
       transform: translateY(-5px);
@@ -119,7 +234,7 @@
         0 10px 22px #4a4a62,
         inset 0 -3px 8px #7273fb;
     }
-    .btn-open:hover {
+    .btn-open:hover:not(:disabled) {
       background: #3b3b70;
       color: #dddeff;
       box-shadow: 0 16px 30px #6f6fffcc;
@@ -132,14 +247,13 @@
         0 16px 32px #0093e9ab,
         inset 0 -3px 10px #48a8ff57;
     }
-    .btn-terminal:hover {
+    .btn-terminal:hover:not(:disabled) {
       background: linear-gradient(45deg, #008cff, #005ecb);
       box-shadow: 0 20px 45px #006ee8cc;
       transform: translateY(-5px);
     }
-
     /* Ripple effect on buttons */
-    button:after {
+    button.btn-group-btn:after {
       content: "";
       position: absolute;
       width: 0; height: 0;
@@ -150,12 +264,19 @@
       transform: translate(-50%, -50%);
       pointer-events: none;
     }
-    button:active:after {
+    button.btn-group-btn:active:after:not(:disabled) {
       width: 120%;
       height: 350%;
       transition: 0s;
     }
-
+    /* Alert container */
+    #alerts {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      max-width: 300px;
+      z-index: 10000;
+    }
     /* Footer */
     footer {
       position: absolute;
@@ -166,7 +287,6 @@
       color: #aa99ffbb;
       user-select: none;
     }
-
     /* Loading overlay */
     #loadingOverlay {
       position: fixed;
@@ -187,7 +307,6 @@
       opacity: 1;
       transition-delay: 0s;
     }
-
     /* Spinner styles */
     .spinner {
       border: 6px solid #f3f3f3; /* Light grey */
@@ -201,10 +320,13 @@
       0% { transform: rotate(0deg);}
       100% { transform: rotate(360deg);}
     }
-
     @media (max-width: 480px) {
       h1 {
         font-size: 2.7rem;
+      }
+      #connectionStatus {
+        font-size: 1rem;
+        margin-bottom: 20px;
       }
       p.lead {
         font-size: 1rem;
@@ -214,70 +336,220 @@
         flex-direction: column;
         gap: 18px;
       }
-      button {
+      button.btn-group-btn {
         width: 100%;
         padding: 14px 0;
         font-size: 1.1rem;
       }
+      #refreshBtn {
+        width: 18px;
+        height: 18px;
+      }
+    }
+    /* Dark/light theme variables */
+    :root[data-theme='dark'] {
+      --bg-gradient-start: #5a11d2;
+      --bg-gradient-end: #927eff;
+      --text-color: #fff;
+    }
+    :root[data-theme='light'] {
+      --bg-gradient-start: #f0f4ff;
+      --bg-gradient-end: #cfd8ff;
+      --text-color: #222;
+    }
+    /* override background and text color based on theme */
+    :root[data-theme='light'] body, :root[data-theme='light'] html {
+      background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+      color: var(--text-color);
+    }
+    :root[data-theme='light'] .landing-container {
+      background: rgba(255,255,255,0.9);
+      box-shadow:
+        inset 0 0 80px #a7a4ff80,
+        0 40px 100px rgba(77, 44, 171, 0.15);
+      color: var(--text-color);
+    }
+    :root[data-theme='light'] #connectionStatus .dot {
+      box-shadow: 0 0 6px #4ade8080;
+    }
+    :root[data-theme='light'] #connectionStatus.connected .dot {
+      background-color: #4ade80;
+      box-shadow: 0 0 8px #4ade80cc;
+    }
+    :root[data-theme='light'] #refreshBtn {
+      color: var(--text-color);
+    }
+    :root[data-theme='light'] button.btn-group-btn {
+      box-shadow: 0 12px 15px rgba(0,0,70,0.15);
+    }
+    :root[data-theme='light'] button.btn-group-btn:active:after:not(:disabled) {
+      background: rgba(0, 0, 0, 0.1);
+    }
+    :root[data-theme='light'] footer {
+      color: #6666aa99;
+    }
+    :root[data-theme='light'] #themeToggle {
+      border-color: var(--text-color);
+      color: var(--text-color);
+    }
+    :root[data-theme='light'] #themeToggle:hover,
+    :root[data-theme='light'] #themeToggle:focus {
+      background-color: var(--text-color);
+      color: var(--bg-gradient-start);
     }
   </style>
 </head>
 <body>
-
   <div class="landing-container" tabindex="0" aria-label="Welcome landing page">
+    <button id="themeToggle" title="Toggle Light/Dark Theme" aria-live="polite" aria-atomic="true"></button>
     <h1>Welcome to Your Pi</h1>
+    <div id="connectionStatus" aria-live="polite" aria-atomic="true" aria-label="Connection status">
+      <span class="dot" aria-hidden="true"></span>
+      <span id="statusText">Checking connection...</span>
+      <button id="refreshBtn" type="button" aria-label="Refresh connection status" title="Refresh status">
+        <!-- SVG circular arrow -->
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M12 4V1L8 5l4 4V6a6 6 0 1 1-6 6H4a8 8 0 1 0 8-8z" />
+        </svg>
+      </button>
+    </div>
     <p class="lead"></p>
-
     <div class="btn-group" role="group" aria-label="Primary actions">
-      <button class="btn btn-shutdown" data-url="http://sameer-desktop.local/shutdown.php">Shutdown Pi</button>
-      <button class="btn btn-reboot" data-url="http://sameer-desktop.local/reboot.php">Reboot Pi</button>
-      <button class="btn btn-open" data-url="http://sameer-desktop.local">Open Pi</button>
-      <button class="btn btn-terminal" data-url="http://sameer-desktop.local:9090">CP-Terminal</button>
+      <button class="btn btn-shutdown btn-group-btn" data-url="http://sameer-desktop.local/shutdown.php" disabled>Shutdown Pi</button>
+      <button class="btn btn-reboot btn-group-btn" data-url="http://sameer-desktop.local/reboot.php" disabled>Reboot Pi</button>
+      <button class="btn btn-open btn-group-btn" data-url="http://sameer-desktop.local" disabled>Open Pi</button>
+      <button class="btn btn-terminal btn-group-btn" data-url="http://sameer-desktop.local:9090" disabled>CP-Terminal</button>
+      <button class="btn btn-media btn-group-btn" data-url="http://sameer-desktop.local/media-server" disabled>Media Server</button>
     </div>
   </div>
-
+  <div id="alerts"></div>
   <div id="loadingOverlay" aria-live="assertive" aria-label="Loading page">
     <div class="spinner" role="img" aria-hidden="true"></div>
   </div>
-
   <footer></footer>
-
   <script>
     const loadingOverlay = document.getElementById('loadingOverlay');
     const buttons = document.querySelectorAll('.btn-group button');
+    const refreshBtn = document.getElementById('refreshBtn');
+    const themeToggle = document.getElementById('themeToggle');
+    const alerts = document.getElementById('alerts');
 
     buttons.forEach(button => {
       button.addEventListener('click', (e) => {
         e.preventDefault();
+        if (button.disabled) return;
         const url = button.getAttribute('data-url');
         if (!url) return;
-        // Show loading overlay
         loadingOverlay.classList.add('visible');
-        // Navigate after a short delay to let overlay appear
         setTimeout(() => {
           window.location.href = url;
         }, 50);
       });
     });
 
-    // Ensure loading overlay is hidden when navigating back to this page
+    refreshBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      checkConnection();
+    });
+
     window.addEventListener('pageshow', () => {
       loadingOverlay.classList.remove('visible');
     });
 
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js').then(registration => {
-        registration.onupdatefound = () => {
-          const newWorker = registration.installing;
-          newWorker.onstatechange = () => {
-            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-              window.location.reload();
-            }
-          };
-        };
-      }).catch(console.error);
+    // Function to update the theme toggle button icon and aria-label using Unicode entities
+    function updateThemeToggleButton(theme) {
+      if (theme === 'light') {
+        // Moon icon for light theme (means switch to dark)
+        themeToggle.innerHTML = '&#x1F319;'; // 🌙
+        themeToggle.setAttribute('aria-label', 'Switch to dark theme');
+        themeToggle.title = 'Switch to Dark Theme';
+      } else {
+        // Sun icon for dark theme (means switch to light)
+        themeToggle.innerHTML = '&#x2600;'; // ☀️
+        themeToggle.setAttribute('aria-label', 'Switch to light theme');
+        themeToggle.title = 'Switch to Light Theme';
+      }
     }
-  </script>
 
+    themeToggle.addEventListener('click', () => {
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+      // Animate rotation
+      themeToggle.classList.add('rotating');
+      setTimeout(() => themeToggle.classList.remove('rotating'), 300);
+      document.documentElement.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+      updateThemeToggleButton(newTheme);
+    });
+
+    window.addEventListener('load', () => {
+      const savedTheme = localStorage.getItem('theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+      updateThemeToggleButton(savedTheme);
+    });
+
+    // Alert helper
+    function showAlert(message, type = 'warning', timeout = 5000) {
+      const alert = document.createElement('div');
+      alert.textContent = message;
+      alert.style.backgroundColor = type === 'error' ? '#ff4b4b' : '#f2c94c';
+      alert.style.color = '#000';
+      alert.style.padding = '10px';
+      alert.style.marginTop = '5px';
+      alert.style.borderRadius = '5px';
+      alert.style.boxShadow = '0 0 6px rgba(0,0,0,0.3)';
+      alerts.appendChild(alert);
+      setTimeout(() => alerts.removeChild(alert), timeout);
+    }
+
+    const statusText = document.getElementById('statusText');
+    const connectionStatus = document.getElementById('connectionStatus');
+    const buttonsArray = Array.from(buttons);
+    const pingUrl = 'http://sameer-desktop.local';
+
+    let lastStatus = null;
+
+    async function checkConnection() {
+      if (lastStatus === null) {
+        statusText.textContent = 'Checking connection...';
+      }
+      try {
+        await fetch(pingUrl + '?_=' + new Date().getTime(), {
+          mode: 'no-cors',
+          cache: 'no-store',
+        });
+        updateStatusIfChanged(true);
+      } catch (e) {
+        updateStatusIfChanged(false);
+      }
+    }
+
+    function updateStatusIfChanged(currentStatus) {
+      if (currentStatus !== lastStatus) {
+        lastStatus = currentStatus;
+        if (currentStatus) {
+          statusText.textContent = 'Connected';
+          connectionStatus.classList.add('connected');
+          connectionStatus.setAttribute('aria-label', 'Status: Connected');
+          enableButtons(true);
+        } else {
+          statusText.textContent = 'Not Connected';
+          connectionStatus.classList.remove('connected');
+          connectionStatus.setAttribute('aria-label', 'Status: Not Connected');
+          enableButtons(false);
+        }
+      }
+    }
+
+    function enableButtons(enable) {
+      buttonsArray.forEach(button => {
+        button.disabled = !enable;
+      });
+    }
+
+    enableButtons(false);
+    checkConnection();
+    setInterval(checkConnection, 5000);
+  </script>
 </body>
 </html>
